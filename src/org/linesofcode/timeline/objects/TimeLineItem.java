@@ -32,12 +32,21 @@ public class TimeLineItem {
 
     public float draw(PApplet context, final PVector connectionPoint) {
 
-        context.textSize(TEXT_SIZE);
+        if (headline != null && text == null) return drawHeadline(context, connectionPoint);
+        if (headline == null && text != null) return drawText(context, connectionPoint);
+        if (headline != null && text != null) return drawHeadlineAndText(context, connectionPoint);
+        return 0;
+    }
 
+    private float drawHeadline(PApplet context, final PVector connectionPoint) {
+        context.textSize(TEXT_SIZE);
         PVector boxBottomLeft = new PVector(connectionPoint.x, connectionPoint.y - Y_DISTANCE_TO_TIMELINE);
         PVector boxTopRight = new PVector(boxBottomLeft.x + 2 * BOX_PADDING + context.textWidth(headline), boxBottomLeft.y -(2*BOX_PADDING + TEXT_SIZE));
 
-        context.line(connectionPoint.x, connectionPoint.y, boxBottomLeft.x, boxBottomLeft.y);
+        if (connected) {
+            context.line(connectionPoint.x, connectionPoint.y, boxBottomLeft.x, boxBottomLeft.y);
+        }
+
         context.rect(boxBottomLeft.x, boxBottomLeft.y,boxTopRight.x - boxBottomLeft.x, boxTopRight.y - boxBottomLeft.y);
         context.fill(Color.BLACK.getRGB());
         context.text(headline, boxBottomLeft.x+BOX_PADDING, boxBottomLeft.y-BOX_PADDING);
@@ -45,6 +54,16 @@ public class TimeLineItem {
 
         return boxTopRight.x - boxBottomLeft.x;
     }
+
+    private float drawText(PApplet context, final PVector connectionPoint) {
+        return 0;
+    }
+
+    private float drawHeadlineAndText(PApplet context, final PVector connectionPoint) {
+        return 0;
+    }
+
+
 
     public void update(final float delta) {
 
