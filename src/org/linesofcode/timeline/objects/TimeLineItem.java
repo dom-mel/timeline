@@ -15,6 +15,7 @@ public class TimeLineItem {
     public static final int Y_DISTANCE_TO_TIMELINE = 10;
     public static final int BOX_PADDING = 10;
     public static final int TEXT_SIZE = 15;
+    public static final int MAX_TEXT_LINE_LENGTH = 70;
 
     private final String headline;
     private final String text;
@@ -38,7 +39,7 @@ public class TimeLineItem {
         return 0;
     }
 
-    private float drawHeadline(PApplet context, final PVector connectionPoint) {
+    private float drawHeadline(final PApplet context, final PVector connectionPoint) {
         context.textSize(TEXT_SIZE);
         PVector boxBottomLeft = new PVector(connectionPoint.x, connectionPoint.y - Y_DISTANCE_TO_TIMELINE);
         PVector boxTopRight = new PVector(boxBottomLeft.x + 2 * BOX_PADDING + context.textWidth(headline), boxBottomLeft.y -(2*BOX_PADDING + TEXT_SIZE));
@@ -55,11 +56,26 @@ public class TimeLineItem {
         return boxTopRight.x - boxBottomLeft.x;
     }
 
-    private float drawText(PApplet context, final PVector connectionPoint) {
+    private float drawText(final PApplet context, final PVector connectionPoint) {
+        String drawText = wrap(text, MAX_TEXT_LINE_LENGTH);
         return 0;
     }
 
-    private float drawHeadlineAndText(PApplet context, final PVector connectionPoint) {
+    /**
+     * from http://ramblingsrobert.wordpress.com/2011/04/13/java-word-wrap-algorithm/
+     */
+    private String wrap(String in,int len) {
+        in=in.trim();
+        if(in.length()<len) return in;
+        if(in.substring(0, len).contains("\n"))
+            return in.substring(0, in.indexOf("\n")).trim() + "\n\n" + wrap(in.substring(in.indexOf("\n") + 1), len);
+        int place=Math.max(Math.max(in.lastIndexOf(" ",len),in.lastIndexOf("\t",len)),in.lastIndexOf("-",len));
+        return in.substring(0,place).trim()+"\n"+wrap(in.substring(place),len);
+    }
+
+
+
+    private float drawHeadlineAndText(final PApplet context, final PVector connectionPoint) {
         return 0;
     }
 
