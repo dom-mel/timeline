@@ -1,87 +1,89 @@
 package org.linesofcode.timeline.objects;
 
-import com.sun.istack.internal.Nullable;
-import processing.core.PApplet;
-import processing.core.PVector;
+import org.linesofcode.timeline.Main;
 
 import java.awt.*;
-import java.util.Date;
 
 /**
  * @author Dominik Eckelmann
  */
 public class TimeLineItem {
 
-    public static final int Y_DISTANCE_TO_TIMELINE = 10;
-    public static final int BOX_PADDING = 10;
-    public static final int TEXT_SIZE = 15;
-    public static final int MAX_TEXT_LINE_LENGTH = 70;
+    public static final int RADIUS = 30;
 
-    private final String headline;
-    private final String text;
-    private final boolean connected;
-    private final Date date;
-    private final int weighs;
+    private int x;
+    private int y;
+    private float red;
+    private float green;
+    private float blue;
 
-    public TimeLineItem(@Nullable final String headline, @Nullable final String text, final boolean connected, final Date date, final int weights) {
-        this.headline = headline;
-        this.text = text;
-        this.connected = connected;
-        this.date = date;
-        this.weighs = weights;
+    private Main context;
+
+    public TimeLineItem(int x, Main context) {
+        this.x = x;
+        this.context = context;
+        red = context.random(255);
+        green = context.random(255);
+        blue = context.random(255);
     }
 
-    public float draw(PApplet context, final PVector connectionPoint) {
+    public void drawCircle() {
 
-        if (headline != null && text == null) return drawHeadline(context, connectionPoint);
-        if (headline == null && text != null) return drawText(context, connectionPoint);
-        if (headline != null && text != null) return drawHeadlineAndText(context, connectionPoint);
-        return 0;
+        context.stroke(Color.BLACK.getRGB());
+        context.fill(red, green, blue);
+
+        final int x1 = x;
+        final int y1 = y;
+        context.ellipse(x1, y1, RADIUS * 2, RADIUS * 2);
     }
 
-    private float drawHeadline(final PApplet context, final PVector connectionPoint) {
-        context.textSize(TEXT_SIZE);
-        PVector boxBottomLeft = new PVector(connectionPoint.x, connectionPoint.y - Y_DISTANCE_TO_TIMELINE);
-        PVector boxTopRight = new PVector(boxBottomLeft.x + 2 * BOX_PADDING + context.textWidth(headline), boxBottomLeft.y -(2*BOX_PADDING + TEXT_SIZE));
+    public void drawLine() {
+        context.stroke(Color.GRAY.getRGB());
+        context.strokeWeight(2);
+        context.line(x, y, x, context.height - Main.BOTTOM_DISTANCE);
+    }
 
-        if (connected) {
-            context.line(connectionPoint.x, connectionPoint.y, boxBottomLeft.x, boxBottomLeft.y);
+    public void update(int index) {
+        y = context.height /2;
+        if (index == 0) {
+            return;
         }
 
-        context.rect(boxBottomLeft.x, boxBottomLeft.y,boxTopRight.x - boxBottomLeft.x, boxTopRight.y - boxBottomLeft.y);
-        context.fill(Color.BLACK.getRGB());
-        context.text(headline, boxBottomLeft.x+BOX_PADDING, boxBottomLeft.y-BOX_PADDING);
-        context.fill(0,0);
+        if (!collides()) {
+            return;
+        }
 
-        return boxTopRight.x - boxBottomLeft.x;
+        // try under
+        for (int newY = context.height / 2; newY < context.height - Main.BOTTOM_DISTANCE - 30; newY++) {
+            y = newY;
+            if (!collides()) {
+                return;
+            }
+        }
+
+        // try above
+        for (int newY = context.height / 2; newY > RADIUS; newY--) {
+            y = newY;
+            if (!collides()) {
+                return;
+            }
+        }
+
     }
 
-    private float drawText(final PApplet context, final PVector connectionPoint) {
-        String drawText = wrap(text, MAX_TEXT_LINE_LENGTH);
-        return 0;
+    private boolean collides() {
+        for (TimeLineItem item : context.getItems()) {
+            if (item.equals(this)) {
+                continue;
+            }
+            if (TimeLineItem.checkCollision(this, item)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    /**
-     * from http://ramblingsrobert.wordpress.com/2011/04/13/java-word-wrap-algorithm/
-     */
-    private String wrap(String in,int len) {
-        in=in.trim();
-        if(in.length()<len) return in;
-        if(in.substring(0, len).contains("\n"))
-            return in.substring(0, in.indexOf("\n")).trim() + "\n\n" + wrap(in.substring(in.indexOf("\n") + 1), len);
-        int place=Math.max(Math.max(in.lastIndexOf(" ",len),in.lastIndexOf("\t",len)),in.lastIndexOf("-",len));
-        return in.substring(0,place).trim()+"\n"+wrap(in.substring(place),len);
-    }
-
-
-
-    private float drawHeadlineAndText(final PApplet context, final PVector connectionPoint) {
-        return 0;
-    }
-
-
-
-    public void update(final float delta) {
-
+    public static boolean checkCollision(TimeLineItem left, TimeLineItem right) {
+        return (Point.distance(left.x, left.y, right.x, right.y) < RADIUS*2);
     }
 }
