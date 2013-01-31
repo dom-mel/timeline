@@ -84,6 +84,6 @@ public class TimeLineItem {
     }
 
     public static boolean checkCollision(TimeLineItem left, TimeLineItem right) {
-        return (Point.distance(left.x, left.y, right.x, right.y) < RADIUS*2);
+        return (Point.distance(left.x, left.y, right.x, right.y) < RADIUS*2 + Main.ITEM_MARGIN);
     }
 }

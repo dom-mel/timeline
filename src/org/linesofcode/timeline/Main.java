@@ -17,13 +17,14 @@ public class Main extends PApplet {
     private static final int DEMO_ITEMS = 100;
 
     public static final int BOTTOM_DISTANCE = 10;
-    public static final int GEN_ITEM_MAX_DISTANCE = 100;
+    public static final int GEN_ITEM_MAX_DISTANCE = 50;
+
+    public static final int ITEM_MARGIN = 5;
 
     private List<TimeLineItem> items;
 
     @Override
     public void setup() {
-        // IPhone 5 resolution
         size(W, H);
         smooth();
 
@@ -42,7 +43,7 @@ public class Main extends PApplet {
 
     @Override
     public void draw() {
-        update(1 / frameRate);
+        update();
         background(Color.WHITE.getRGB());
 
         for (final TimeLineItem item : items) {
@@ -58,7 +59,7 @@ public class Main extends PApplet {
         line(0,height - BOTTOM_DISTANCE,width, height - BOTTOM_DISTANCE);
     }
 
-    public void update(final float delta) {
+    public void update() {
 
         for (int i = 0; i < items.size(); i++) {
             items.get(i).update(i);
